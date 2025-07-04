@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidoHub.exceptions;
+package com.fiap.postech.pedidohub.config;
 
 public class ErroInternoException extends RuntimeException {
     public ErroInternoException(String message) {

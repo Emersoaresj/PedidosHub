@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidoHub.cliente.dto;
+package com.fiap.postech.pedidohub.cliente.api.dto;
 
 import lombok.Data;
 

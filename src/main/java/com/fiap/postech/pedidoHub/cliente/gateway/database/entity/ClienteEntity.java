@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidoHub.cliente.gateway.database.entity;
+package com.fiap.postech.pedidohub.cliente.gateway.database.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

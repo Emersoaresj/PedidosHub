@@ -1,25 +1,25 @@
-package com.fiap.postech.pedidoHub.cliente.gateway.database;
+package com.fiap.postech.pedidohub.cliente.gateway.database;
 
-import com.fiap.postech.pedidoHub.cliente.domain.Cliente;
-import com.fiap.postech.pedidoHub.cliente.gateway.ClienteRepositoryPort;
-import com.fiap.postech.pedidoHub.cliente.gateway.database.entity.ClienteEntity;
-import com.fiap.postech.pedidoHub.cliente.dto.ClienteDto;
-import com.fiap.postech.pedidoHub.cliente.mapper.ClienteMapper;
-import com.fiap.postech.pedidoHub.cliente.gateway.database.repository.ClienteRepository;
-import com.fiap.postech.pedidoHub.utils.ConstantUtils;
+import com.fiap.postech.pedidohub.cliente.api.dto.ClienteDto;
+import com.fiap.postech.pedidohub.cliente.api.mapper.ClienteMapper;
+import com.fiap.postech.pedidohub.cliente.domain.model.Cliente;
+import com.fiap.postech.pedidohub.cliente.gateway.database.entity.ClienteEntity;
+import com.fiap.postech.pedidohub.cliente.gateway.database.repository.ClienteRepositoryJPA;
+import com.fiap.postech.pedidohub.cliente.gateway.port.ClienteRepositoryPort;
+import com.fiap.postech.pedidohub.config.ErroInternoException;
+import com.fiap.postech.pedidohub.utils.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Slf4j
-@Service
+@Repository
 public class ClienteRepositoryImpl implements ClienteRepositoryPort {
 
     @Autowired
-    private ClienteRepository clienteRepository;
-
+    private ClienteRepositoryJPA clienteRepository;
 
     @Override
     public ClienteDto cadastraCliente(Cliente cliente) {
@@ -29,19 +29,18 @@ public class ClienteRepositoryImpl implements ClienteRepositoryPort {
             return montaResponse(clienteEntity);
         } catch (Exception e) {
             log.error("Erro ao cadastrar cliente", e);
-            throw new RuntimeException("Erro ao cadastrar cliente: " + e.getMessage());
+            throw new ErroInternoException("Erro ao cadastrar cliente: " + e.getMessage());
         }
     }
 
     @Override
     public Optional<Cliente> findByCpfCliente(String cpf) {
         try {
-            ClienteEntity clienteEntity = clienteRepository.findByCpfCliente(cpf).orElse(null);
-            Cliente cliente = ClienteMapper.INSTANCE.entityToDomain(clienteEntity);
-            return Optional.of(cliente);
+            return clienteRepository.findByCpfCliente(cpf)
+                    .map(ClienteMapper.INSTANCE::entityToDomain);
         } catch (Exception e) {
             log.error("Erro ao buscar CPF", e);
-            throw new RuntimeException("Erro ao buscar CPF: " + e.getMessage());
+            throw new ErroInternoException("Erro ao buscar CPF: " + e.getMessage());
         }
     }
 

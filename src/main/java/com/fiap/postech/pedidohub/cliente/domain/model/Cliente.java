@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidoHub.cliente.domain;
+package com.fiap.postech.pedidohub.cliente.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,4 +30,11 @@ public class Cliente {
         return dataNascimento != null && !dataNascimento.isAfter(LocalDate.now());
     }
 
+    public boolean cepFormatoValido() {
+        return cep != null && cep.matches("\\d{5}-\\d{3}");
+    }
+
+    public boolean estadoFormatoValido() {
+        return estado != null && estado.matches("[A-Z]{2}");
+    }
 }
