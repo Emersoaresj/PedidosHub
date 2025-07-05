@@ -1,6 +1,5 @@
 package com.fiap.postech.pedidohub.cliente.gateway.database;
 
-import com.fiap.postech.pedidohub.cliente.api.dto.ClienteDto;
 import com.fiap.postech.pedidohub.cliente.api.mapper.ClienteMapper;
 import com.fiap.postech.pedidohub.cliente.domain.model.Cliente;
 import com.fiap.postech.pedidohub.cliente.gateway.database.entity.ClienteEntity;
@@ -8,10 +7,13 @@ import com.fiap.postech.pedidohub.cliente.gateway.database.repository.ClienteRep
 import com.fiap.postech.pedidohub.cliente.gateway.port.ClienteRepositoryPort;
 import com.fiap.postech.pedidohub.config.ErroInternoException;
 import com.fiap.postech.pedidohub.utils.ConstantUtils;
+import com.fiap.postech.pedidohub.utils.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -22,7 +24,7 @@ public class ClienteRepositoryImpl implements ClienteRepositoryPort {
     private ClienteRepositoryJPA clienteRepository;
 
     @Override
-    public ClienteDto cadastraCliente(Cliente cliente) {
+    public ResponseDto cadastraCliente(Cliente cliente) {
         try {
             ClienteEntity clienteEntity = ClienteMapper.INSTANCE.domainToEntity(cliente);
             clienteRepository.save(clienteEntity);
@@ -44,15 +46,17 @@ public class ClienteRepositoryImpl implements ClienteRepositoryPort {
         }
     }
 
-    private ClienteDto montaResponse(ClienteEntity clienteEntity) {
-        ClienteDto clienteDto = new ClienteDto();
-        clienteDto.setMensagem(ConstantUtils.CLIENTE_CADASTRADO);
-        clienteDto.setNome(clienteEntity.getNomeCliente());
-        clienteDto.setCpf(clienteEntity.getCpfCliente());
-        clienteDto.setDataNascimento(clienteEntity.getDataNascimento());
+    private ResponseDto montaResponse(ClienteEntity clienteEntity) {
+        ResponseDto response = new ResponseDto();
+        response.setMessage(ConstantUtils.CLIENTE_CADASTRADO);
 
-        return clienteDto;
+        Map<String, Object> data = new HashMap<>();
+        data.put("nomeCliente", clienteEntity.getNomeCliente());
+        data.put("cpfCliente", clienteEntity.getCpfCliente());
+        data.put("dataNascimento", clienteEntity.getDataNascimento());
+
+        response.setData(data);
+        return response;
     }
-
 
 }

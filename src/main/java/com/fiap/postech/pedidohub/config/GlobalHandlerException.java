@@ -2,6 +2,9 @@ package com.fiap.postech.pedidohub.config;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fiap.postech.pedidohub.cliente.domain.exceptions.*;
+import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidPrecoException;
+import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidSkuException;
+import com.fiap.postech.pedidohub.produto.domain.exceptions.ProdutoExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -117,6 +120,33 @@ public class GlobalHandlerException {
         response.put(MENSAGEM, invalidEstadoException.getMessage());
         response.put(STATUS, HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPrecoException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidPrecoException(InvalidPrecoException invalidPrecoException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, invalidPrecoException.getMessage());
+        response.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidSkuException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidPrecoException(InvalidSkuException invalidSkuException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, invalidSkuException.getMessage());
+        response.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProdutoExistsException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidPrecoException(ProdutoExistsException produtoExistsException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, produtoExistsException.getMessage());
+        response.put(STATUS, HttpStatus.CONFLICT.value());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
 

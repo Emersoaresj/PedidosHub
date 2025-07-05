@@ -20,7 +20,12 @@ public class ConstantUtils {
     public static final String CEP_INVALIDO = "CEP inválido! O formato deve ser XXXXX-XXX";
     public static final String ESTADO_INVALIDO = "Estado inválido! O formato deve ser XX (sigla do estado)";
 
+    public static final String PRODUTO_JA_EXISTE = "O produto já está cadastrado!";
+    public static final String PRECO_INVALIDO = "Preço inválido! O preço deve ser maior que zero.";
+    public static final String SKU_INVALIDO = "SKU inválido. O SKU deve ser alfanumérico e com hífens entre as palavras. Exemplo válido: NB-DEL-001";
+
+
     //SUCESSO
     public static final String CLIENTE_CADASTRADO = "Usuário cadastrado com sucesso!";
-
+    public static final String PRODUTO_CADASTRADO = "Produto cadastrado com sucesso!";
 }

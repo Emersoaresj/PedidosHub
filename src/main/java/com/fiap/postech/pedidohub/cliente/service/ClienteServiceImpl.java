@@ -1,6 +1,5 @@
 package com.fiap.postech.pedidohub.cliente.service;
 
-import com.fiap.postech.pedidohub.cliente.api.dto.ClienteDto;
 import com.fiap.postech.pedidohub.cliente.api.dto.ClienteRequest;
 import com.fiap.postech.pedidohub.cliente.api.mapper.ClienteMapper;
 import com.fiap.postech.pedidohub.cliente.domain.exceptions.*;
@@ -9,6 +8,7 @@ import com.fiap.postech.pedidohub.cliente.gateway.port.ClienteRepositoryPort;
 import com.fiap.postech.pedidohub.cliente.gateway.port.ClienteServicePort;
 import com.fiap.postech.pedidohub.config.ErroInternoException;
 import com.fiap.postech.pedidohub.utils.ConstantUtils;
+import com.fiap.postech.pedidohub.utils.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,12 @@ public class ClienteServiceImpl implements ClienteServicePort {
 
 
     @Override
-    public ClienteDto cadastraCliente(ClienteRequest request) {
+    public ResponseDto cadastraCliente(ClienteRequest request) {
 
         try {
             Cliente cliente = ClienteMapper.INSTANCE.requestToDomain(request);
 
-            validarCliente(cliente);
+            validaCliente(cliente);
 
             return repositoryPort.cadastraCliente(cliente);
 
@@ -41,7 +41,7 @@ public class ClienteServiceImpl implements ClienteServicePort {
         }
     }
 
-    private void validarCliente(Cliente cliente) {
+    private void validaCliente(Cliente cliente) {
         if (!cliente.cpfFormatoValido()) {
             log.warn("CPF com formato inválido: {}", cliente.getCpfCliente());
             throw new InvalidCpfException(ConstantUtils.CPF_INVALIDO);
