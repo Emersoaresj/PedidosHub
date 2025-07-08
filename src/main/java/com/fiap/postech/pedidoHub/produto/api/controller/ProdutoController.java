@@ -1,5 +1,6 @@
 package com.fiap.postech.pedidohub.produto.api.controller;
 
+import com.fiap.postech.pedidohub.produto.api.dto.ProdutoDto;
 import com.fiap.postech.pedidohub.utils.ResponseDto;
 import com.fiap.postech.pedidohub.produto.api.dto.ProdutoRequest;
 import com.fiap.postech.pedidohub.produto.gateway.port.ProdutoServicePort;
@@ -7,10 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/produtos")
@@ -25,5 +23,10 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(produto);
     }
 
-    // @GetMapping("/{sku}") para consulta por SKU
+    @GetMapping("/sku/{sku}")
+    public ResponseEntity<ProdutoDto> buscarPorSku(@PathVariable String sku) {
+        ProdutoDto produto = service.buscarPorSku(sku);
+        return ResponseEntity.status(HttpStatus.OK).body(produto);
+    }
+
 }

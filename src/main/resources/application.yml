@@ -28,6 +28,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
 server:
   port: 8080
+
+produto:
+  service:
+    url: ${PRODUTO_SERVICE_URL:http://localhost:8082}

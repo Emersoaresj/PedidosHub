@@ -2,9 +2,13 @@ package com.fiap.postech.pedidohub.config;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fiap.postech.pedidohub.cliente.domain.exceptions.*;
+import com.fiap.postech.pedidohub.estoque.domain.exceptions.EstoqueExistsException;
+import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidQuantidadeEstoqueException;
+import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidSkuEstoqueException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidPrecoException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidSkuException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.ProdutoExistsException;
+import com.fiap.postech.pedidohub.produto.domain.exceptions.ProdutoNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -148,6 +152,43 @@ public class GlobalHandlerException {
         response.put(STATUS, HttpStatus.CONFLICT.value());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ProdutoNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlerProdutoNotFoundException(ProdutoNotFoundException produtoNotFoundException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, produtoNotFoundException.getMessage());
+        response.put(STATUS, HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EstoqueExistsException.class)
+    public ResponseEntity<Map<String, Object>> handlerEstoqueExistsException(EstoqueExistsException estoqueExistsException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, estoqueExistsException.getMessage());
+        response.put(STATUS, HttpStatus.CONFLICT.value());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidQuantidadeEstoqueException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidQuantidadeEstoqueException(InvalidQuantidadeEstoqueException invalidQuantidadeEstoqueException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, invalidQuantidadeEstoqueException.getMessage());
+        response.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidSkuEstoqueException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidSkuEstoqueException(InvalidSkuEstoqueException invalidSkuEstoqueException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, invalidSkuEstoqueException.getMessage());
+        response.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 
 
 }

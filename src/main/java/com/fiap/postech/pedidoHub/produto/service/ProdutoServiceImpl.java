@@ -1,5 +1,8 @@
 package com.fiap.postech.pedidohub.produto.service;
 
+import com.fiap.postech.pedidohub.produto.api.dto.ProdutoDto;
+import com.fiap.postech.pedidohub.produto.domain.exceptions.ProdutoNotFoundException;
+import com.fiap.postech.pedidohub.produto.gateway.database.entity.ProdutoEntity;
 import com.fiap.postech.pedidohub.utils.ResponseDto;
 import com.fiap.postech.pedidohub.config.ErroInternoException;
 import com.fiap.postech.pedidohub.produto.api.mapper.ProdutoMapper;
@@ -25,7 +28,7 @@ public class ProdutoServiceImpl implements ProdutoServicePort {
     @Override
     public ResponseDto cadastrarProduto(ProdutoRequest request) {
 
-        try{
+        try {
             Produto produto = ProdutoMapper.INSTANCE.requestToDomain(request);
 
             validaProduto(produto);
@@ -40,6 +43,22 @@ public class ProdutoServiceImpl implements ProdutoServicePort {
 
 
     }
+
+    @Override
+    public ProdutoDto buscarPorSku(String sku) {
+        try {
+            Produto produto = repositoryPort.findBySkuProduto(sku)
+                    .orElseThrow(() -> new ProdutoNotFoundException(ConstantUtils.PRODUTO_NAO_ENCONTRADO));
+            return ProdutoMapper.INSTANCE.domainToDtoClient(produto);
+        } catch (ProdutoNotFoundException e) {
+            log.error("Produto não encontrado para o SKU: {}", sku, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao buscar produto por SKU: {}", sku, e);
+            throw new ErroInternoException("Erro interno ao tentar buscar produto: " + e.getMessage());
+        }
+    }
+
 
     private void validaProduto(Produto produto) {
         if (!produto.precoValido()) {

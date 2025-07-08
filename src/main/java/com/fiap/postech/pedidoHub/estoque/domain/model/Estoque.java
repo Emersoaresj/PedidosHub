@@ -1,23 +1,21 @@
-package com.fiap.postech.pedidohub.produto.domain.model;
+package com.fiap.postech.pedidohub.estoque.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Produto {
+public class Estoque {
 
+    private Integer idEstoque;
     private Integer idProduto;
-    private String nomeProduto;
     private String skuProduto;
-    private BigDecimal precoProduto;
+    private Integer quantidadeEstoque;
 
-    public boolean precoValido() {
-        return precoProduto != null && precoProduto.compareTo(BigDecimal.ZERO) > 0;
+    public boolean quantidadeValida() {
+        return quantidadeEstoque != null && quantidadeEstoque >= 0;
     }
 
     public boolean skuValido() {
