@@ -1,5 +1,6 @@
 package com.fiap.postech.pedidohub.pedido.service;
 
+import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
 import com.fiap.postech.pedidohub.pedido.api.dto.*;
 import com.fiap.postech.pedidohub.pedido.domain.model.Pedido;
 import com.fiap.postech.pedidohub.pedido.domain.exceptions.InvalidPedidoException;
@@ -36,25 +37,23 @@ public class PedidoServiceImpl implements PedidoServicePort {
     @Override
     public ResponseDto cadastrarPedido(PedidoRequest request) {
         // Busca cliente
-        PedidoClienteDto cliente = pedidoClienteClient.buscarPorCpf(request.getCpfCliente());
+        PedidoClienteDto cliente = chamadaClienteClient(request.getCpfCliente());
         Integer idCliente = cliente.getIdCliente();
 
-        // Para cada item na request, busca o produto e monta PedidoItem completo
+
         List<PedidoItem> itens = new ArrayList<>();
         for (PedidoItemRequest itemReq : request.getItens()) {
-            try {
-                PedidoProdutoDto produto = produtoClient.buscarPorSku(itemReq.getSkuProduto());
-                PedidoItem item = new PedidoItem(
-                        null,
-                        produto.getIdProduto(),
-                        itemReq.getQuantidadeItem(),
-                        produto.getPrecoProduto()
-                );
-                itens.add(item);
-            } catch (feign.FeignException.NotFound e) {
-                log.warn("Produto não encontrado para o SKU: {}", itemReq.getSkuProduto());
-                throw new PedidoProdutoNotFoundException(ConstantUtils.PRODUTO_NAO_ENCONTRADO);
-            }
+
+            // Chama o serviço de produto para obter detalhes do produto
+            PedidoProdutoDto produto = chamadaProdutoClient(itemReq.getSkuProduto());
+
+            PedidoItem item = new PedidoItem(
+                    null,
+                    produto.getIdProduto(),
+                    itemReq.getQuantidadeItem(),
+                    produto.getPrecoProduto()
+            );
+            itens.add(item);
         }
 
         Pedido pedido = new Pedido(
@@ -72,10 +71,37 @@ public class PedidoServiceImpl implements PedidoServicePort {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         pedido.setValorTotalPedido(valorTotal);
 
+        // Após a criação do pedido, valida os seus dados
         validarPedido(pedido);
 
         return repositoryPort.cadastrarPedido(pedido);
     }
+
+    private PedidoClienteDto chamadaClienteClient(String cpfCliente) {
+        try {
+            return pedidoClienteClient.buscarPorCpf(cpfCliente);
+        } catch (feign.FeignException.NotFound e) {
+            log.warn("Cliente não encontrado para o CPF: {}", cpfCliente);
+            throw new InvalidPedidoException(ConstantUtils.CLIENTE_NAO_ENCONTRADO);
+        } catch (Exception e) {
+            log.error("Erro ao chamar o serviço de cliente: {}", e.getMessage());
+            throw new ErroInternoException("Erro ao buscar cliente: " + e.getMessage());
+        }
+    }
+
+
+    private PedidoProdutoDto chamadaProdutoClient(String skuProduto) {
+        try {
+            return produtoClient.buscarPorSku(skuProduto);
+        } catch (feign.FeignException.NotFound e) {
+            log.warn("Produto não encontrado para o SKU: {}", skuProduto);
+            throw new PedidoProdutoNotFoundException(ConstantUtils.PRODUTO_NAO_ENCONTRADO);
+        } catch (Exception e) {
+            log.error("Erro ao chamar o serviço de produto: {}", e.getMessage());
+            throw new ErroInternoException("Erro ao buscar produto: " + e.getMessage());
+        }
+    }
+
 
     private void validarPedido(Pedido pedido) {
         if (pedido == null) {
@@ -91,5 +117,6 @@ public class PedidoServiceImpl implements PedidoServicePort {
             throw new InvalidPedidoException(ConstantUtils.VALOR_TOTAL_PEDIDO_INVALIDO);
         }
     }
+
 
 }
