@@ -1,13 +1,13 @@
 package com.fiap.postech.pedidohub.estoque.gateway.database;
 
-import com.fiap.postech.pedidohub.config.ErroInternoException;
+import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
 import com.fiap.postech.pedidohub.estoque.domain.model.Estoque;
 import com.fiap.postech.pedidohub.estoque.gateway.database.entity.EstoqueEntity;
 import com.fiap.postech.pedidohub.estoque.gateway.database.repository.EstoqueRepositoryJPA;
 import com.fiap.postech.pedidohub.estoque.gateway.port.EstoqueRepositoryPort;
 import com.fiap.postech.pedidohub.estoque.api.mapper.EstoqueMapper;
-import com.fiap.postech.pedidohub.utils.ConstantUtils;
-import com.fiap.postech.pedidohub.utils.ResponseDto;
+import com.fiap.postech.pedidohub.commom.utils.ConstantUtils;
+import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

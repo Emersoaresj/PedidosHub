@@ -1,7 +1,7 @@
 package com.fiap.postech.pedidohub.produto.api.controller;
 
 import com.fiap.postech.pedidohub.produto.api.dto.ProdutoDto;
-import com.fiap.postech.pedidohub.utils.ResponseDto;
+import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
 import com.fiap.postech.pedidohub.produto.api.dto.ProdutoRequest;
 import com.fiap.postech.pedidohub.produto.gateway.port.ProdutoServicePort;
 import jakarta.validation.Valid;

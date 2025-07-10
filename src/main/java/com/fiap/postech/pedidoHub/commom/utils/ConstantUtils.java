@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidohub.utils;
+package com.fiap.postech.pedidohub.commom.utils;
 
 import lombok.Data;
 
@@ -15,6 +15,7 @@ public class ConstantUtils {
 
     //ERROS
     public static final String CLIENTE_JA_EXISTE = "O cliente já está cadastrado!";
+    public static final String CLIENTE_NAO_ENCONTRADO = "Cliente não encontrado para o CPF informado.";
     public static final String CPF_INVALIDO = "CPF inválido! O formato deve ser XXX.XXX.XXX-XX";
     public static final String DATA_NASCIMENTO_INVALIDA = "Data de nascimento inválida! A data não pode ser futura.";
     public static final String CEP_INVALIDO = "CEP inválido! O formato deve ser XXXXX-XXX";
@@ -27,8 +28,13 @@ public class ConstantUtils {
 
     public static final String ESTOQUE_JA_EXISTE = "Já existe estoque cadastrado para o SKU informado.";
 
+    public static final String PEDIDO_NAO_PODE_SER_NULO = "O pedido não pode ser nulo!";
+    public static final String ITENS_PEDIDO_INVALIDOS = "Itens do pedido inválidos! Verifique se todos os itens possuem SKU e quantidade válidos.";
+    public static final String VALOR_TOTAL_PEDIDO_INVALIDO = "Valor total do pedido inválido! O valor total deve ser maior que zero.";
+
     //SUCESSO
     public static final String CLIENTE_CADASTRADO = "Usuário cadastrado com sucesso!";
     public static final String PRODUTO_CADASTRADO = "Produto cadastrado com sucesso!";
     public static final String ESTOQUE_CADASTRADO = "Estoque cadastrado com sucesso!";
+    public static final String PEDIDO_CADASTRADO = "Pedido cadastrado com sucesso!";
 }

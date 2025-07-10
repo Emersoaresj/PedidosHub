@@ -1,11 +1,11 @@
-package com.fiap.postech.pedidohub.produto.api.dto;
+package com.fiap.postech.pedidohub.pedido.api.dto;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class ProdutoDto {
+public class PedidoProdutoDto {
 
     private Integer idProduto;
     private String skuProduto;

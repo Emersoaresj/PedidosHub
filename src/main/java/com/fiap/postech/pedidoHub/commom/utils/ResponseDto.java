@@ -1,4 +1,4 @@
-package com.fiap.postech.pedidohub.utils;
+package com.fiap.postech.pedidohub.commom.utils;
 
 import lombok.Data;
 

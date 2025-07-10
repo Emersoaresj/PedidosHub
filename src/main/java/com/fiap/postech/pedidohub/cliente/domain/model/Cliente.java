@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Data
 public class Cliente {
 
+    private Integer idCliente;
     private String nomeCliente;
     private String cpfCliente;
     private LocalDate dataNascimento;

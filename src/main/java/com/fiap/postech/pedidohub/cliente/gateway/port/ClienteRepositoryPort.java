@@ -1,7 +1,7 @@
 package com.fiap.postech.pedidohub.cliente.gateway.port;
 
 import com.fiap.postech.pedidohub.cliente.domain.model.Cliente;
-import com.fiap.postech.pedidohub.utils.ResponseDto;
+import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
 
 import java.util.Optional;
 

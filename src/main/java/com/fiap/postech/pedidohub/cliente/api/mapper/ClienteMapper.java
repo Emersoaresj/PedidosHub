@@ -1,5 +1,6 @@
 package com.fiap.postech.pedidohub.cliente.api.mapper;
 
+import com.fiap.postech.pedidohub.cliente.api.dto.ClienteDto;
 import com.fiap.postech.pedidohub.cliente.domain.model.Cliente;
 import com.fiap.postech.pedidohub.cliente.gateway.database.entity.ClienteEntity;
 import com.fiap.postech.pedidohub.cliente.api.dto.ClienteRequest;
@@ -18,5 +19,7 @@ public interface ClienteMapper {
     Cliente entityToDomain(ClienteEntity entity);
 
     Cliente requestToDomain(ClienteRequest request);
+
+    ClienteDto domainToDto(Cliente cliente);
 
 }

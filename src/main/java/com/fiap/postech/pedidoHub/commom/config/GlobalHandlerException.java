@@ -1,10 +1,12 @@
-package com.fiap.postech.pedidohub.config;
+package com.fiap.postech.pedidohub.commom.config;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fiap.postech.pedidohub.cliente.domain.exceptions.*;
 import com.fiap.postech.pedidohub.estoque.domain.exceptions.EstoqueExistsException;
 import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidQuantidadeEstoqueException;
 import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidSkuEstoqueException;
+import com.fiap.postech.pedidohub.pedido.domain.exceptions.InvalidPedidoException;
+import com.fiap.postech.pedidohub.pedido.domain.exceptions.PedidoProdutoNotFoundException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidPrecoException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.InvalidSkuException;
 import com.fiap.postech.pedidohub.produto.domain.exceptions.ProdutoExistsException;
@@ -89,6 +91,17 @@ public class GlobalHandlerException {
         response.put(STATUS, HttpStatus.CONFLICT.value());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ClienteNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlerClienteNotFoundException(ClienteNotFoundException clienteNotFoundException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, clienteNotFoundException.getMessage());
+        response.put(STATUS, HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+
 
     @ExceptionHandler(InvalidCpfException.class)
     public ResponseEntity<Map<String, Object>> handlerInvalidCpfException(InvalidCpfException invalidCpfException) {
@@ -189,6 +202,23 @@ public class GlobalHandlerException {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PedidoProdutoNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlerProdutoPedidoNotFoundException(PedidoProdutoNotFoundException pedidoProdutoNotFoundException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, pedidoProdutoNotFoundException.getMessage());
+        response.put(STATUS, HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidPedidoException.class)
+    public ResponseEntity<Map<String, Object>> handlerInvalidPedidoException(InvalidPedidoException invalidPedidoException) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(TIMESTAMP, LocalDateTime.now());
+        response.put(MENSAGEM, invalidPedidoException.getMessage());
+        response.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
 
 }

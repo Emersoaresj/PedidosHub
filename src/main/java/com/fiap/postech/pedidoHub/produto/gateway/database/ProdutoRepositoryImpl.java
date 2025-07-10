@@ -1,13 +1,13 @@
 package com.fiap.postech.pedidohub.produto.gateway.database;
 
-import com.fiap.postech.pedidohub.utils.ResponseDto;
-import com.fiap.postech.pedidohub.config.ErroInternoException;
+import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
+import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
 import com.fiap.postech.pedidohub.produto.api.mapper.ProdutoMapper;
 import com.fiap.postech.pedidohub.produto.domain.model.Produto;
 import com.fiap.postech.pedidohub.produto.gateway.database.entity.ProdutoEntity;
 import com.fiap.postech.pedidohub.produto.gateway.database.repository.ProdutoRepositoryJPA;
 import com.fiap.postech.pedidohub.produto.gateway.port.ProdutoRepositoryPort;
-import com.fiap.postech.pedidohub.utils.ConstantUtils;
+import com.fiap.postech.pedidohub.commom.utils.ConstantUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

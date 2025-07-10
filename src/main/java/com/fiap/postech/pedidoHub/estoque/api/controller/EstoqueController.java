@@ -2,7 +2,7 @@ package com.fiap.postech.pedidohub.estoque.api.controller;
 
 import com.fiap.postech.pedidohub.estoque.api.dto.EstoqueRequest;
 import com.fiap.postech.pedidohub.estoque.gateway.port.EstoqueServicePort;
-import com.fiap.postech.pedidohub.utils.ResponseDto;
+import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
