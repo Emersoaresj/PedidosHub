@@ -53,6 +53,7 @@ public class PedidoRepositoryImpl implements PedidoRepositoryPort {
         response.setMessage(ConstantUtils.PEDIDO_CADASTRADO);
 
         Map<String, Object> data = new HashMap<>();
+        data.put("idPedido", pedidoEntity.getIdPedido());
         data.put("idCliente", pedidoEntity.getIdCliente());
         data.put("statusPedido", pedidoEntity.getStatusPedido());
         data.put("dataPedido", pedidoEntity.getDataPedido());

@@ -7,7 +7,7 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
-      group-id: pedidoHub-group
+      group-id: pedido-group
       auto-offset-reset: earliest
       properties:
         spring.json.trusted.packages: '*'
