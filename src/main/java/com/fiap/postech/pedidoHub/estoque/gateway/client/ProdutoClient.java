@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "estoque-produto-service", url = "${produto.service.url}")
 public interface ProdutoClient {
 
+    // Método para buscar produto por SKU
     @GetMapping("/api/produtos/sku/{sku}")
     ProdutoDto buscarPorSku(@PathVariable("sku") String sku);
 }
