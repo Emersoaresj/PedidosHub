@@ -14,9 +14,14 @@ public interface PedidoMapper {
     PedidoMapper INSTANCE = Mappers.getMapper(PedidoMapper.class);
 
     @Mapping(target = "idPedido", ignore = true)
-    PedidoEntity domainToEntity(Pedido pedido);
+    PedidoEntity domainToEntityCreate(Pedido pedido);
+
+    PedidoEntity domainToEntityUpdate(Pedido pedido);
 
     @Mapping(target = "idPedidoItem", ignore = true)
     @Mapping(target = "idPedido", ignore = true)
     PedidoItemEntity domainToItemEntity(PedidoItem item);
+
+    @Mapping(target = "itens", ignore = true)
+    Pedido entityToDomain (PedidoEntity pedidoEntity);
 }

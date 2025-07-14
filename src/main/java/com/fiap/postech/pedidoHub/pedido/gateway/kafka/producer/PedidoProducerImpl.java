@@ -1,7 +1,7 @@
-package com.fiap.postech.pedidohub.pedido.gateway.kafka;
+package com.fiap.postech.pedidohub.pedido.gateway.kafka.producer;
 
 import com.fiap.postech.pedidohub.pedido.api.dto.kafka.PedidoKafkaDTO;
-import com.fiap.postech.pedidohub.pedido.gateway.port.PedidoProducerPort;
+import com.fiap.postech.pedidohub.pedido.gateway.kafka.port.PedidoProducerPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

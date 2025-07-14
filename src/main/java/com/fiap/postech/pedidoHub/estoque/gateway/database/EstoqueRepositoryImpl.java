@@ -1,6 +1,7 @@
 package com.fiap.postech.pedidohub.estoque.gateway.database;
 
 import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
+import com.fiap.postech.pedidohub.estoque.domain.exceptions.ProdutoNotFoundException;
 import com.fiap.postech.pedidohub.estoque.domain.model.Estoque;
 import com.fiap.postech.pedidohub.estoque.gateway.database.entity.EstoqueEntity;
 import com.fiap.postech.pedidohub.estoque.gateway.database.repository.EstoqueRepositoryJPA;
@@ -29,7 +30,7 @@ public class EstoqueRepositoryImpl implements EstoqueRepositoryPort {
             EstoqueEntity entity = EstoqueMapper.INSTANCE.domainToEntity(estoque);
             EstoqueEntity saved = estoqueRepositoryJPA.save(entity);
             log.info("Cadastrando estoque para o SKU: {}", estoque.getSkuProduto());
-            return montaResponse(saved);
+            return montaResponse(saved, "cadastrar");
         } catch (Exception e) {
             log.error("Erro ao cadastrar estoque", e);
             throw new ErroInternoException("Erro ao cadastrar estoque: " + e.getMessage());
@@ -46,9 +47,41 @@ public class EstoqueRepositoryImpl implements EstoqueRepositoryPort {
         }
     }
 
-    private ResponseDto montaResponse(EstoqueEntity estoqueEntity) {
+    @Override
+    public Estoque buscarPorIdProduto(Integer idProduto) {
+        try{
+            EstoqueEntity estoqueEntity = estoqueRepositoryJPA.findByIdProduto(idProduto)
+                    .orElseThrow(() -> new ProdutoNotFoundException(ConstantUtils.PRODUTO_NAO_ENCONTRADO));
+            return EstoqueMapper.INSTANCE.entityToDomain(estoqueEntity);
+
+        } catch (Exception e) {
+            log.error("Erro ao buscar estoque por ID do produto: {}", idProduto, e);
+            throw new ErroInternoException("Erro ao buscar estoque: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseDto atualizarEstoque(Estoque estoque) {
+        try {
+            EstoqueEntity entity = EstoqueMapper.INSTANCE.domainToEntity(estoque);
+            EstoqueEntity updated = estoqueRepositoryJPA.save(entity);
+
+            log.info("Atualizando estoque para o SKU: {}", estoque.getSkuProduto());
+            return montaResponse(updated, "atualizar");
+        } catch (Exception e) {
+            log.error("Erro ao atualizar estoque", e);
+            throw new ErroInternoException("Erro ao atualizar estoque: " + e.getMessage());
+        }
+    }
+
+    private ResponseDto montaResponse(EstoqueEntity estoqueEntity, String tipoAcao) {
         ResponseDto response = new ResponseDto();
-        response.setMessage(ConstantUtils.ESTOQUE_CADASTRADO);
+
+        if ("cadastrar".equals(tipoAcao)) {
+            response.setMessage(ConstantUtils.ESTOQUE_CADASTRADO);
+        } else if ("atualizar".equals(tipoAcao)) {
+            response.setMessage(ConstantUtils.ESTOQUE_ATUALIZADO);
+        }
 
         Map<String, Object> data = new HashMap<>();
         data.put("skuProduto", estoqueEntity.getSkuProduto());

@@ -9,4 +9,8 @@ public interface EstoqueRepositoryPort {
 
     boolean existeEstoquePorIdProduto(Integer idProduto);
 
+    Estoque buscarPorIdProduto(Integer idProduto);
+
+    ResponseDto atualizarEstoque(Estoque estoque);
+
 }

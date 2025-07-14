@@ -1,12 +1,9 @@
 package com.fiap.postech.pedidohub.estoque.service;
 
 import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
-import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidQuantidadeEstoqueException;
-import com.fiap.postech.pedidohub.estoque.domain.exceptions.InvalidSkuEstoqueException;
+import com.fiap.postech.pedidohub.estoque.api.dto.*;
+import com.fiap.postech.pedidohub.estoque.domain.exceptions.*;
 import com.fiap.postech.pedidohub.estoque.domain.model.Estoque;
-import com.fiap.postech.pedidohub.estoque.domain.exceptions.EstoqueExistsException;
-import com.fiap.postech.pedidohub.estoque.domain.exceptions.ProdutoNotFoundException;
-import com.fiap.postech.pedidohub.estoque.api.dto.EstoqueRequest;
 import com.fiap.postech.pedidohub.estoque.gateway.client.ProdutoClient;
 import com.fiap.postech.pedidohub.estoque.gateway.port.EstoqueRepositoryPort;
 import com.fiap.postech.pedidohub.estoque.gateway.port.EstoqueServicePort;
@@ -34,7 +31,7 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
         try {
             Estoque estoque = EstoqueMapper.INSTANCE.requestToDomain(request);
 
-            validaEstoque(estoque);
+            validaCriacaoEstoque(estoque);
 
             ProdutoDto produto = chamadaProdutoClient(estoque);
             estoque.setIdProduto(produto.getIdProduto());
@@ -54,7 +51,66 @@ public class EstoqueServiceImpl implements EstoqueServicePort {
         }
     }
 
-    private void validaEstoque(Estoque estoque) {
+    @Override
+    public ResponseDto atualizarEstoque(AtualizaEstoqueRequest request) {
+        try {
+            if (!repositoryPort.existeEstoquePorIdProduto(request.getIdProduto())) {
+                log.warn("Estoque não encontrado para o ID do produto: {}", request.getIdProduto());
+                throw new EstoqueNotFoundException(ConstantUtils.ESTOQUE_NAO_ENCONTRADO);
+            }
+
+            Estoque estoque = repositoryPort.buscarPorIdProduto(request.getIdProduto());
+            estoque.setQuantidadeEstoque(request.getNovaQuantidade());
+            return repositoryPort.atualizarEstoque(estoque);
+
+        } catch (EstoqueNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro inesperado ao atualizar estoque", e);
+            throw new ErroInternoException("Erro interno ao tentar atualizar estoque: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public BaixaEstoqueResponse baixarEstoque(BaixaEstoqueRequest request) {
+
+        for (ItemEstoqueBaixaDTO item : request.getItens()) {
+            if (!validaEstoque(item.getIdProduto(), item.getQuantidade())) {
+                return new BaixaEstoqueResponse(false, "Estoque insuficiente para o produto ID: " + item.getIdProduto());
+            }
+        }
+
+        // Se todos têm estoque, baixa todos de uma vez
+        for (ItemEstoqueBaixaDTO item : request.getItens()) {
+            Estoque estoque = repositoryPort.buscarPorIdProduto(item.getIdProduto());
+            estoque.setQuantidadeEstoque(estoque.getQuantidadeEstoque() - item.getQuantidade());
+            repositoryPort.atualizarEstoque(estoque);
+        }
+
+        return new BaixaEstoqueResponse(true, "Estoque baixado com sucesso");
+    }
+
+    @Override
+    public BaixaEstoqueResponse restaurarEstoque(BaixaEstoqueRequest request) {
+
+        for (ItemEstoqueBaixaDTO item : request.getItens()) {
+            Estoque estoque = repositoryPort.buscarPorIdProduto(item.getIdProduto());
+            if (estoque == null) {
+                return new BaixaEstoqueResponse(false, "Estoque não encontrado para o produto ID: " + item.getIdProduto());
+            }
+            estoque.setQuantidadeEstoque(estoque.getQuantidadeEstoque() + item.getQuantidade());
+            repositoryPort.atualizarEstoque(estoque);
+        }
+        return new BaixaEstoqueResponse(true, "Estoque restaurado com sucesso");
+    }
+
+    private boolean validaEstoque(Integer idProduto, Integer quantidade) {
+        // Se o estoque for nulo ou a quantidade for insuficiente, retorna false
+        Estoque estoque = repositoryPort.buscarPorIdProduto(idProduto);
+        return estoque != null && estoque.getQuantidadeEstoque() >= quantidade;
+    }
+
+    private void validaCriacaoEstoque(Estoque estoque) {
         if (!estoque.quantidadeValida()) {
             log.warn("Quantidade inválida para o SKU: {}", estoque.getSkuProduto());
             throw new InvalidQuantidadeEstoqueException("Quantidade não pode ser negativa.");

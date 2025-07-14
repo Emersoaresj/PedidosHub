@@ -18,4 +18,7 @@ public interface EstoqueMapper {
     @Mapping(target = "skuProduto", source = "skuProduto")
     EstoqueEntity domainToEntity(Estoque estoque);
 
+
+    Estoque entityToDomain(EstoqueEntity entity);
+
 }

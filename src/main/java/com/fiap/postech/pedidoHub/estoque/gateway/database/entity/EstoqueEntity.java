@@ -15,10 +15,10 @@ public class EstoqueEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_estoque")
-    private Long idEstoque;
+    private Integer idEstoque;
 
     @Column(name = "id_produto", nullable = false, unique = true)
-    private Long idProduto; // FK para Produto
+    private Integer idProduto; // FK para Produto
 
     @Column(name = "sku_produto", nullable = false, unique = true)
     private String skuProduto;

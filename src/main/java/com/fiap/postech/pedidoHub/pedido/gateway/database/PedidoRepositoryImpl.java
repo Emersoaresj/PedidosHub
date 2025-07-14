@@ -32,7 +32,7 @@ public class PedidoRepositoryImpl implements PedidoRepositoryPort {
     @Override
     public ResponseDto cadastrarPedido(Pedido pedido) {
         try {
-            PedidoEntity pedidoEntity = PedidoMapper.INSTANCE.domainToEntity(pedido);
+            PedidoEntity pedidoEntity = PedidoMapper.INSTANCE.domainToEntityCreate(pedido);
             PedidoEntity savedPedido = pedidoRepositoryJPA.save(pedidoEntity);
 
             for (PedidoItem item : pedido.getItens()) {
@@ -41,17 +41,42 @@ public class PedidoRepositoryImpl implements PedidoRepositoryPort {
                 pedidoItemRepositoryJPA.save(itemEntity);
             }
 
-            return montaResponse(savedPedido);
+            return montaResponse(savedPedido, "cadastrar");
         } catch (Exception e) {
             log.error("Erro ao cadastrar pedido", e);
             throw new ErroInternoException("Erro ao cadastrar pedido: " + e.getMessage());
         }
     }
 
-    private ResponseDto montaResponse(PedidoEntity pedidoEntity) {
-        ResponseDto response = new ResponseDto();
-        response.setMessage(ConstantUtils.PEDIDO_CADASTRADO);
+    @Override
+    public Pedido buscarPedidoPorId(Integer idPedido) {
+        PedidoEntity pedidoEntity = pedidoRepositoryJPA.findById(idPedido)
+                .orElseThrow(() -> new ErroInternoException("Pedido não encontrado com ID: " + idPedido));
+        return PedidoMapper.INSTANCE.entityToDomain(pedidoEntity);
+    }
 
+    @Override
+    public ResponseDto atualizarPedido(Pedido pedido) {
+        try {
+            PedidoEntity entity = PedidoMapper.INSTANCE.domainToEntityUpdate(pedido);
+            PedidoEntity updated = pedidoRepositoryJPA.save(entity);
+            return montaResponse(updated, "atualizar");
+
+        } catch (Exception e) {
+            log.error("Erro ao atualizar pedido", e);
+            throw new ErroInternoException("Erro ao atualizar pedido: " + e.getMessage());
+        }
+    }
+
+
+    private ResponseDto montaResponse(PedidoEntity pedidoEntity, String tipoAcao) {
+        ResponseDto response = new ResponseDto();
+
+        if ("cadastrar".equals(tipoAcao)) {
+            response.setMessage(ConstantUtils.PEDIDO_CADASTRADO);
+        } else {
+            response.setMessage(ConstantUtils.PEDIDO_CADASTRADO);
+        }
         Map<String, Object> data = new HashMap<>();
         data.put("idPedido", pedidoEntity.getIdPedido());
         data.put("idCliente", pedidoEntity.getIdCliente());

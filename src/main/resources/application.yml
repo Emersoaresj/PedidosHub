@@ -38,3 +38,11 @@ produto:
 cliente:
     service:
         url: ${CLIENTE_SERVICE_URL:http://localhost:8081}
+
+estoque:
+  service:
+    url: ${ESTOQUE_SERVICE_URL:http://localhost:8083}
+
+pagamento:
+  service:
+    url: ${PAGAMENTO_SERVICE_URL:http://localhost:8086}

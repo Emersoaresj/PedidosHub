@@ -2,15 +2,17 @@ package com.fiap.postech.pedidohub.pedido.service;
 
 import com.fiap.postech.pedidohub.commom.config.ErroInternoException;
 import com.fiap.postech.pedidohub.pedido.api.dto.*;
-import com.fiap.postech.pedidohub.pedido.api.dto.client.PedidoClienteDto;
-import com.fiap.postech.pedidohub.pedido.api.dto.client.PedidoProdutoDto;
+import com.fiap.postech.pedidohub.pedido.api.dto.client.cliente.PedidoClienteDto;
+import com.fiap.postech.pedidohub.pedido.api.dto.client.produto.PedidoProdutoDto;
 import com.fiap.postech.pedidohub.pedido.api.dto.kafka.PedidoItemKafkaDTO;
 import com.fiap.postech.pedidohub.pedido.api.dto.kafka.PedidoKafkaDTO;
+import com.fiap.postech.pedidohub.pedido.domain.exceptions.PedidoNotFoundException;
 import com.fiap.postech.pedidohub.pedido.domain.model.Pedido;
 import com.fiap.postech.pedidohub.pedido.domain.exceptions.InvalidPedidoException;
 import com.fiap.postech.pedidohub.pedido.domain.exceptions.PedidoProdutoNotFoundException;
 import com.fiap.postech.pedidohub.pedido.domain.model.PedidoItem;
-import com.fiap.postech.pedidohub.pedido.gateway.port.PedidoProducerPort;
+import com.fiap.postech.pedidohub.pedido.gateway.kafka.port.PedidoProducerPort;
+import com.fiap.postech.pedidohub.pedido.gateway.port.PedidoItemRepositoryPort;
 import com.fiap.postech.pedidohub.pedido.gateway.port.PedidoRepositoryPort;
 import com.fiap.postech.pedidohub.pedido.gateway.port.PedidoServicePort;
 import com.fiap.postech.pedidohub.pedido.gateway.client.PedidoClienteClient;
@@ -43,6 +45,9 @@ public class PedidoServiceImpl implements PedidoServicePort {
     @Autowired
     private PedidoProducerPort pedidoProducerPort;
 
+    @Autowired
+    private PedidoItemRepositoryPort pedidoItemRepositoryPort;
+
     @Override
     public ResponseDto cadastrarPedido(PedidoRequest request) {
 
@@ -63,6 +68,92 @@ public class PedidoServiceImpl implements PedidoServicePort {
         pedidoProducerPort.enviarMensagem(dto);
 
         return response;
+    }
+
+    @Override
+    public ResponseDto atualizarPedido(Integer id, AtualizarPedidoRequest request) {
+        try {
+            Pedido pedidoExistente = repositoryPort.buscarPedidoPorId(id);
+            if (pedidoExistente == null) {
+                throw new PedidoNotFoundException(ConstantUtils.PEDIDO_NAO_ENCONTRADO);
+            }
+
+            // Busca todos os itens existentes desse pedido
+            List<PedidoItem> itensExistentes = buscarItensPedido(id);
+
+            boolean allItemsUpdated = true;
+
+            for (PedidoItemRequest itemReq : request.getItens()) {
+                PedidoProdutoDto produto = chamadaProdutoClient(itemReq.getSkuProduto());
+                Integer idProduto = produto.getIdProduto();
+
+                // Busca o item já existente pelo idPedido e idProduto
+                PedidoItem itemExistente = itensExistentes.stream()
+                        .filter(item -> item.getIdProduto().equals(idProduto))
+                        .findFirst()
+                        .orElse(null);
+
+                if (itemExistente != null) {
+                    itemExistente.setQuantidadeItem(itemReq.getQuantidadeItem());
+                    itemExistente.setPrecoUnitarioItem(produto.getPrecoProduto());
+                    boolean updated = pedidoItemRepositoryPort.atualizarPedidoItem(itemExistente);
+                    if (!updated) {
+                        allItemsUpdated = false;
+                        break; // Para na primeira falha
+                    }
+                }
+            }
+
+            if (!allItemsUpdated) {
+                throw new ErroInternoException("Erro ao atualizar um ou mais itens do pedido.");
+            }
+
+            // Busca todos os itens atualizados para calcular o novo valor total
+            List<PedidoItem> itensAtualizados = buscarItensPedido(id);
+            BigDecimal valorTotalAtualizado = calcularValorTotal(itensAtualizados);
+            pedidoExistente.setValorTotalPedido(valorTotalAtualizado);
+
+            // Atualiza o pedido no banco
+            ResponseDto response = repositoryPort.atualizarPedido(pedidoExistente);
+            return response;
+
+        } catch (PedidoNotFoundException e) {
+            log.error("Pedido não encontrado para o ID: {}", id);
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro ao atualizar pedido: {}", e.getMessage());
+            throw new ErroInternoException("Erro ao atualizar pedido: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseDto atualizaStatusPedido(Integer id, PedidoStatus novoStatus) {
+        try {
+            Pedido pedidoExistente = repositoryPort.buscarPedidoPorId(id);
+            pedidoExistente.setStatusPedido(novoStatus);
+
+            return repositoryPort.atualizarPedido(pedidoExistente);
+        } catch (Exception e) {
+            log.error("Erro ao atualizar status do pedido: {}", e.getMessage());
+            throw new ErroInternoException("Erro ao atualizar status do pedido: " + e.getMessage());
+        }
+
+    }
+
+    private List<PedidoItem> buscarItensPedido(Integer id) {
+        try {
+            List<PedidoItem> itens = pedidoItemRepositoryPort.buscarItensPedido(id);
+            if (itens == null || itens.isEmpty()) {
+                log.warn("Nenhum item encontrado para o pedido: {}", id);
+                throw new InvalidPedidoException(ConstantUtils.ITENS_PEDIDO_NAO_ENCONTRADOS);
+            }
+            return itens;
+        } catch (InvalidPedidoException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Erro ao buscar itens do pedido: {}", e.getMessage());
+            throw new ErroInternoException("Erro ao buscar itens do pedido: " + e.getMessage());
+        }
     }
 
     private Integer buscarIdCliente(String cpfCliente) {

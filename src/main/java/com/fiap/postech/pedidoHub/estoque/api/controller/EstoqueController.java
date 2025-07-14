@@ -1,5 +1,8 @@
 package com.fiap.postech.pedidohub.estoque.api.controller;
 
+import com.fiap.postech.pedidohub.estoque.api.dto.AtualizaEstoqueRequest;
+import com.fiap.postech.pedidohub.estoque.api.dto.BaixaEstoqueRequest;
+import com.fiap.postech.pedidohub.estoque.api.dto.BaixaEstoqueResponse;
 import com.fiap.postech.pedidohub.estoque.api.dto.EstoqueRequest;
 import com.fiap.postech.pedidohub.estoque.gateway.port.EstoqueServicePort;
 import com.fiap.postech.pedidohub.commom.utils.ResponseDto;
@@ -17,16 +20,28 @@ public class EstoqueController {
     private EstoqueServicePort service;
 
 
-    @PostMapping
+    @PostMapping("/cadastrar")
     public ResponseEntity<ResponseDto> cadastrarEstoque(@Valid @RequestBody EstoqueRequest request) {
         ResponseDto estoque = service.cadastrarEstoque(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(estoque);
     }
 
-    // Exemplos de endpoints que podem ser úteis:
-    // @GetMapping("/{sku}")
-    // public ResponseEntity<EstoqueDto> consultarPorSku(@PathVariable String sku) { ... }
-    //
-    // @PutMapping("/{sku}")
-    // public ResponseEntity<EstoqueDto> atualizarQuantidade(@PathVariable String sku, @RequestBody AtualizaEstoqueRequest req) { ... }
+    @PostMapping("/baixa")
+    public ResponseEntity<BaixaEstoqueResponse> baixarEstoque(@Valid @RequestBody BaixaEstoqueRequest request) {
+        BaixaEstoqueResponse estoque = service.baixarEstoque(request);
+        return ResponseEntity.status(HttpStatus.OK).body(estoque);
+    }
+
+    @PutMapping("/atualizar")
+    public ResponseEntity<ResponseDto> atualizarEstoque(@Valid @RequestBody AtualizaEstoqueRequest request) {
+        ResponseDto estoque = service.atualizarEstoque(request);
+        return ResponseEntity.status(HttpStatus.OK).body(estoque);
+    }
+
+    @PostMapping("/restaurar")
+    public ResponseEntity<BaixaEstoqueResponse> restaurarEstoque(@Valid @RequestBody BaixaEstoqueRequest request) {
+        BaixaEstoqueResponse response = service.restaurarEstoque(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
